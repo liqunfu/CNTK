@@ -34,8 +34,8 @@ namespace CNTKLibraryCSEvalExamples
             Console.WriteLine("n1Clone: on " + n1Clone.Device.AsString() + ", Storage:" + n1Clone.StorageFormat + ", Shape:" + n1Clone.Shape.AsString());
             Console.WriteLine("n1CloneCPU: on " + n1CloneCPU.Device.AsString() + ", Storage:" + n1CloneCPU.StorageFormat + ", Shape:" + n1CloneCPU.Shape.AsString());
 
-            int[] dimensions = { 4, 5 };
-            var shape2 = NDShape.CreateNDShape(dimensions);
+            uint[] dimensions = { 4, 5 };
+            var shape2 = new NDShape(dimensions);
             float[] nonZeroValues = { 1, 5, 4, 2, 3, 9, 7, 8, 6 };
             int[] rowIndices = { 0, 2, 0, 1, 1, 3, 2, 2, 3 };
             int[] colStarts = { 0, 2, 4, 6, 7, 9};

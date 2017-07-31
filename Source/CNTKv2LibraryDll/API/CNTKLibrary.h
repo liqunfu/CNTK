@@ -333,20 +333,20 @@ namespace CNTK
         friend bool operator==(const NDShape& first, const NDShape& second);
         friend class PrimitiveFunction;
 
-        static const size_t SentinelDimValueForUnknownShape = (size_t)-2;
+        static const size_t SentinelDimValueForUnknownShape = (unsigned long)-2;
     public:
 
         ///
         /// A placeholder value to use for an axis whose dimension is unknown and is to be inferred by the system.
         ///
-        static const size_t InferredDimension = (size_t)-1;
+        static const size_t InferredDimension = (unsigned long)-1;
 
         ///
         /// A placeholder value to use for an axis whose dimension is unbound and is only determined
         /// when actual data is bound to the variable. Note that since the actual dimension is bound
         /// from actual minibatch data, the dimension can vary across different evaluations.
         ///
-        static const size_t FreeDimension = (size_t)-3;
+        static const size_t FreeDimension = (unsigned long)-3;
 
         ///
         /// A placeholder shape to use to denote an unknown shape
@@ -5360,6 +5360,16 @@ namespace CNTK
         return CreateCompositeMinibatchSource(config);
     }
 
+    inline MinibatchSourcePtr TextFormatMinibatchSourceExperiment(const std::wstring& dataFilePath, const std::vector<StreamConfiguration>& streamConfigs)
+    {
+        return TextFormatMinibatchSource(dataFilePath, streamConfigs, MinibatchSource::FullDataSweep, false);
+    }
+
+    inline MinibatchSourcePtr TextFormatMinibatchSourceExperimentRandom(const std::wstring& dataFilePath, const std::vector<StreamConfiguration>& streamConfigs)
+    {
+        return TextFormatMinibatchSource(dataFilePath, streamConfigs, MinibatchSource::FullDataSweep, true);
+    }
+
     ///
     /// Compute the per dimension means and variances for each of the specified streams using data from the specified minibatchSource.
     ///
@@ -5787,27 +5797,27 @@ namespace CNTK
         /// 
         /// Updates the writer with the accumulated loss/metric since the start of training.
         ///
-        void UpdateTraining(size_t numSamples, const ValuePtr& accumulatedLoss, const ValuePtr& accumulatedMetric);
+        CNTK_API void UpdateTraining(size_t numSamples, const ValuePtr& accumulatedLoss, const ValuePtr& accumulatedMetric);
 
         ///
         /// Updates the writer with the accumulated metric since the start of evaluation.
         ///
-        void UpdateTest(size_t numSamples, const ValuePtr& accumulatedMetric);
+        CNTK_API void UpdateTest(size_t numSamples, const ValuePtr& accumulatedMetric);
 
         ///
         /// Updates the writer with the accumulated metric since the start of evaluation.
         ///
-        void UpdateDistributedSync(size_t numSamples, const ValuePtr& accumulatedMetric);
+        CNTK_API void UpdateDistributedSync(size_t numSamples, const ValuePtr& accumulatedMetric);
 
         ///
         /// Writes a summary of training progress since the last call to this function.
         ///
-        void WriteTrainingSummary(const ValuePtr& accumulatedLoss, const ValuePtr& accumulatedMetric);
+        CNTK_API void WriteTrainingSummary(const ValuePtr& accumulatedLoss, const ValuePtr& accumulatedMetric);
 
         ///
         /// Writes a summary of evaluation progress since the last call to this function.
         ///
-        void WriteTestSummary(const ValuePtr& accumulatedMetric);
+        CNTK_API void WriteTestSummary(const ValuePtr& accumulatedMetric);
 
     private:
         // Disallow copy and move construction and assignment
@@ -5843,4 +5853,32 @@ namespace std
              return std::hash<size_t>()(x.m_globalRank);
         }
     };
+}
+
+namespace CNTK
+{
+    CNTK_API FunctionPtr Embedding2(const Variable& input, size_t embeddingDim, const DeviceDescriptor& device);
+
+    CNTK_API FunctionPtr LSTMPComponentWithSelfStabilization2(const Variable& embeddingFunction, size_t numOutputClasses,
+        size_t LSTMDim, size_t cellDim, const DeviceDescriptor& device, const std::wstring& outputName);
+
+    CNTK_API FunctionPtr ConvBatchNormalizationLayer(Variable input, size_t outFeatureMapCount, size_t kernelWidth, size_t kernelHeight,
+        size_t hStride, size_t vStride, double wScale, double bValue, double scValue, size_t bnTimeConst, bool spatial, const DeviceDescriptor& device);
+
+    CNTK_API FunctionPtr ConvBatchNormalizationReLULayer(Variable input, size_t outFeatureMapCount, size_t kernelWidth, size_t kernelHeight,
+        size_t hStride, size_t vStride, double wScale, double bValue, double scValue, size_t bnTimeConst, bool spatial, const DeviceDescriptor& device);
+
+    CNTK_API FunctionPtr ProjectLayer(Variable wProj, Variable input, size_t hStride, size_t vStride, double bValue, double scValue, size_t bnTimeConst, const DeviceDescriptor& device);
+
+    CNTK_API FunctionPtr ResNetNode(Variable input, size_t outFeatureMapCount, size_t kernelWidth, size_t kernelHeight, double wScale, 
+        double bValue, double scValue, size_t bnTimeConst, bool spatial, const DeviceDescriptor& device);
+
+    CNTK_API FunctionPtr ResNetNodeInc(Variable input, size_t outFeatureMapCount, size_t kernelWidth, size_t kernelHeight, double wScale, 
+        double bValue, double scValue, size_t bnTimeConst, bool spatial, Variable wProj, const DeviceDescriptor& device);
+
+    CNTK_API FunctionPtr ResNetNodeA(Variable input, size_t outFeatureMapCount, size_t kernelWidth, size_t kernelHeight, 
+        double wScale, double bValue, double scValue, size_t bnTimeConst, bool spatial, const DeviceDescriptor& device);
+
+    CNTK_API FunctionPtr ResNetNodeBInc(Variable input, size_t outFeatureMapCount, size_t kernelWidth, size_t kernelHeight, 
+        double wScale, double bValue, double scValue, size_t bnTimeConst, bool spatial, const DeviceDescriptor& device);
 }

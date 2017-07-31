@@ -98,6 +98,17 @@ int main(int argc, char *argv[])
     }
     else if (!testName.compare("MNISTClassifier"))
     {
+        unsigned long InferredDimension = (unsigned long)-1;
+        size_t InferredDimension_t = (size_t)-1;
+        unsigned long InferredDimension2 = (unsigned long)InferredDimension_t;
+        size_t InferredDimension_t2 = InferredDimension;
+        if (InferredDimension_t2 == InferredDimension_t ||
+            InferredDimension2 != -1)
+            fprintf(stderr, "Ha");
+
+        size_t a = 18446744073709551614;
+        unsigned long long l = a;
+        fprintf(stderr, "%lld\n", l);
         MNISTClassifierTests();
     }
     else if (!testName.compare("SequenceToSequence"))

@@ -25,6 +25,15 @@
 #define CNTK_API
 #endif
 
+#ifdef __cplusplus
+#define SK_C_PLUS_PLUS_BEGIN_GUARD    extern "C" {
+#define SK_C_PLUS_PLUS_END_GUARD      }
+#else
+#include <stdbool.h>
+#define SK_C_PLUS_PLUS_BEGIN_GUARD
+#define SK_C_PLUS_PLUS_END_GUARD
+#endif
+
 #include <memory>
 #include <vector>
 #include <array>

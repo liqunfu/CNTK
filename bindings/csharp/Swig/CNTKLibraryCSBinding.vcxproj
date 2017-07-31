@@ -111,11 +111,14 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cntk_cs_wrap.cxx" />
+    <ClCompile Include="cntk_cs_wrap.cxx">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug_CpuOnly|x64'">/bigobj</AdditionalOptions>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\CNTKv2LibraryDll\API\CNTKLibrary.h" />
     <ClInclude Include="..\..\..\Source\CNTKv2LibraryDll\API\CNTKLibraryInternals.h" />
+    <ClInclude Include="..\..\..\Source\CNTKv2LibraryDll\API\MomentumAsTimeConstantScheduleSeparatedHeader.h" />
     <ClInclude Include="cntk_cs_wrap.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,1 @@
+#include "cntk_Constant.h"

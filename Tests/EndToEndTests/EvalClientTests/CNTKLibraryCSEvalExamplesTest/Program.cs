@@ -52,6 +52,17 @@ namespace CNTKLibraryCSEvalExamples
             {
                 var device = DeviceDescriptor.CPUDevice;
 
+                SimpleFeedForwardClassifierTest.TrainSimpleFeedForwardClassifier(device);
+                MNISTClassifierTest.TrainMNISTClassifier(device);
+                LSTMSequenceClassifierTest.TrainLSTMSequenceClassifier(device, false, false);
+                LSTMSequenceClassifierExtTest.TrainLSTMSequenceClassifier(device, false, false);
+                CifarResNetTest.TrainResNetCifarClassifier(device, false);
+
+                // CNTKLibraryManagedExamples.TestReduceSum((uint)1, DeviceDescriptor.CPUDevice);
+                // extra eval tests
+                CNTKLibraryManagedExamples.EvaluateCombinedOutputs(device);
+                CNTKLibraryManagedExamples.EvaluateIntermediateLayer(device);
+
                 CNTKLibraryManagedExamples.EvaluationSingleImage(device);
                 // Run memory tests.
                 MemoryTests.ValidateObjectReferences(device);

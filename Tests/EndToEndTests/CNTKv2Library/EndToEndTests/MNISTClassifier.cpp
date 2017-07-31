@@ -138,7 +138,10 @@ void MNISTClassifierTests()
     fprintf(stderr, "\nMNISTClassifierTests..\n");
 
     if (ShouldRunOnCpu())
+    {
+        TrainMNISTClassifier(DeviceDescriptor::CPUDevice());
         TrainSimpleFeedForwardClassifier(DeviceDescriptor::CPUDevice());
+    }
     if (ShouldRunOnGpu())
         TrainMNISTClassifier(DeviceDescriptor::GPUDevice(0));
 }

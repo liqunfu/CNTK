@@ -18,6 +18,131 @@ namespace CNTKLibraryCSEvalExamples
 {
     public class CNTKLibraryManagedExamples
     {
+        public static void EvaluateIntermediateLayer(DeviceDescriptor device)
+        {
+            try
+            {
+                Console.WriteLine("\n===== Evaluate single image =====");
+
+                string modelFilePath = @"ResNet18_ImageNet_CNTK.model";
+                ThrowIfFileNotExist(modelFilePath, string.Format("Error: The model '{0}' does not exist. Please follow instructions in README.md in <CNTK>/Examples/Image/Classification/ResNet to create the model.", modelFilePath));
+                Function rootFunc = Function.Load(modelFilePath, device);
+
+                Function interLayerFunc = rootFunc.FindByName("z.x");
+                Function modelFunc = Function.AsComposite(interLayerFunc);
+
+                Variable outputVar = interLayerFunc.Output;
+                Variable inputVar = modelFunc.Arguments.Single();
+
+                // Get shape data for the input variable
+                NDShape inputShape = inputVar.Shape;
+                int imageWidth = inputShape[0];
+                int imageHeight = inputShape[1];
+                int imageChannels = inputShape[2];
+                int imageSize = inputShape.TotalSize;
+
+                var inputDataMap = new Dictionary<Variable, Value>();
+                var outputDataMap = new Dictionary<Variable, Value>();
+
+                // Image preprocessing to match input requirements of the model.
+                // This program uses images from the CIFAR-10 dataset for evaluation.
+                // Please see README.md in <CNTK>/Examples/Image/DataSets/CIFAR-10 about how to download the CIFAR-10 dataset.
+                string sampleImage = "00000.png";
+                ThrowIfFileNotExist(sampleImage, string.Format("Error: The sample image '{0}' does not exist. Please see README.md in <CNTK>/Examples/Image/DataSets/CIFAR-10 about how to download the CIFAR-10 dataset.", sampleImage));
+                Bitmap bmp = new Bitmap(Bitmap.FromFile(sampleImage));
+                var resized = bmp.Resize((int)imageWidth, (int)imageHeight, true);
+                List<float> resizedCHW = resized.ParallelExtractCHW();
+
+                // Create input data map
+                var inputVal = Value.CreateBatch(inputVar.Shape, resizedCHW, device);
+                inputDataMap.Add(inputVar, inputVal);
+
+                // Create output data map. Using null as Value to indicate using system allocated memory.
+                // Alternatively, create a Value object and add it to the data map.
+                outputDataMap.Add(outputVar, null);
+
+                // Start evaluation on the device
+                modelFunc.Evaluate(inputDataMap, outputDataMap, device);
+
+                // Get evaluate result as dense output
+                var outputVal = outputDataMap[outputVar];
+                var outputData = outputVal.GetDenseData<float>(outputVar);
+
+                PrintOutput(outputVar.Shape.TotalSize, outputData);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: {0}\nCallStack: {1}\n Inner Exception: {2}", ex.Message, ex.StackTrace, ex.InnerException != null ? ex.InnerException.Message : "No Inner Exception");
+                throw ex;
+            }
+        }
+        public static void EvaluateCombinedOutputs(DeviceDescriptor device)
+        {
+            try
+            {
+                Console.WriteLine("\n===== Evaluate single image =====");
+
+                string modelFilePath = @"ResNet_18.model";
+                ThrowIfFileNotExist(modelFilePath, string.Format("Error: The model '{0}' does not exist. Please follow instructions in README.md in <CNTK>/Examples/Image/Classification/ResNet to create the model.", modelFilePath));
+                Function modelFunc = Function.Load(modelFilePath, device);
+
+                Function cosine_distance = modelFunc.FindByName("query_positive_document_cosine_distance");
+                Variable queryDocumentCosineDistance = cosine_distance.Output;
+
+                Function evalFunc = Function.Combine(new[] { modelFunc.Output, queryDocumentCosineDistance });
+
+                Variable inputVar = evalFunc.Arguments.Single();
+
+                // Get shape data for the input variable
+                NDShape inputShape = inputVar.Shape;
+                int imageWidth = inputShape[0];
+                int imageHeight = inputShape[1];
+                int imageChannels = inputShape[2];
+                int imageSize = inputShape.TotalSize;
+
+                var inputDataMap = new Dictionary<Variable, Value>();
+                var outputDataMap = new Dictionary<Variable, Value>();
+
+                // Image preprocessing to match input requirements of the model.
+                // This program uses images from the CIFAR-10 dataset for evaluation.
+                // Please see README.md in <CNTK>/Examples/Image/DataSets/CIFAR-10 about how to download the CIFAR-10 dataset.
+                string sampleImage = "00000.png";
+                ThrowIfFileNotExist(sampleImage, string.Format("Error: The sample image '{0}' does not exist. Please see README.md in <CNTK>/Examples/Image/DataSets/CIFAR-10 about how to download the CIFAR-10 dataset.", sampleImage));
+                Bitmap bmp = new Bitmap(Bitmap.FromFile(sampleImage));
+                var resized = bmp.Resize((int)imageWidth, (int)imageHeight, true);
+                List<float> resizedCHW = resized.ParallelExtractCHW();
+
+                // Create input data map
+                var inputVal = Value.CreateBatch(inputVar.Shape, resizedCHW, device);
+                inputDataMap.Add(inputVar, inputVal);
+
+                // Create output data map. Using null as Value to indicate using system allocated memory.
+                // Alternatively, create a Value object and add it to the data map.
+                var positiveDocumentRecurrenceOutput1 = evalFunc.Outputs[1];
+                var queryDocumentCosineDistance1 = evalFunc.Outputs[2];
+
+                outputDataMap.Add(positiveDocumentRecurrenceOutput1, null);
+                outputDataMap.Add(queryDocumentCosineDistance1, null);
+
+                // Start evaluation on the device
+                modelFunc.Evaluate(inputDataMap, outputDataMap, device);
+
+                // Get evaluate result as dense output
+                foreach (var outputVariableValuePair in outputDataMap)
+                {
+                    var variable = outputVariableValuePair.Key;
+                    var value = outputVariableValuePair.Value;
+                    var outputData = value.GetDenseData<float>(variable);
+                    PrintOutput(variable.Shape.TotalSize, outputData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: {0}\nCallStack: {1}\n Inner Exception: {2}", ex.Message, ex.StackTrace, ex.InnerException != null ? ex.InnerException.Message : "No Inner Exception");
+                throw ex;
+            }
+        }
+
         /// <summary>
         /// The example shows
         /// - how to load model.
@@ -36,7 +161,8 @@ namespace CNTKLibraryCSEvalExamples
                 // Load the model.
                 // The model resnet20.dnn is trained by <CNTK>/Examples/Image/Classification/ResNet/Python/Models/TrainResNet_CIFAR10.py
                 // Please see README.md in <CNTK>/Examples/Image/Classification/ResNet about how to train the model.
-                string modelFilePath = "resnet20.dnn";
+                // string modelFilePath = "resnet20.dnn";
+                string modelFilePath = "ResNet20_CIFAR10_Python.model";
                 ThrowIfFileNotExist(modelFilePath, string.Format("Error: The model '{0}' does not exist. Please follow instructions in README.md in <CNTK>/Examples/Image/Classification/ResNet to create the model.", modelFilePath));
                 Function modelFunc = Function.Load(modelFilePath, device);
 

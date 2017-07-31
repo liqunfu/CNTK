@@ -83,6 +83,20 @@ namespace CNTK
             return inputVector;
         }
 
+        internal static SizeTVector AsSizeTVector(IEnumerable<uint> input)
+        {
+            var inputVector = new SizeTVector();
+            foreach (var element in input)
+            {
+                if (element < 0)
+                {
+                    throw new System.ArgumentException("The argument cannot contain a negative value");
+                }
+                inputVector.Add(element);
+            }
+            return inputVector;
+        }
+
         /// <summary>
         /// Helper function to create a BoolVector from IEnumerable.
         /// </summary>
@@ -98,5 +112,107 @@ namespace CNTK
             return inputVector;
         }
 
+        internal static StreamConfigurationVector AsStreamConfigurationVector(IList<StreamConfiguration> input)
+        {
+            StreamConfigurationVector inputVector = new StreamConfigurationVector();
+            foreach (var element in input)
+            {
+                inputVector.Add(element);
+            }
+            return inputVector;
+        }
+
+        internal static UnorderedMapStreamInformationPairNDArrayViewPtrNDArrayViewPtr 
+            AsUnorderedMapStreamInformationPairNDArrayViewPtrNDArrayViewPtr(
+            IDictionary<StreamInformation, Tuple<NDArrayView, NDArrayView>> input)
+        {
+            UnorderedMapStreamInformationPairNDArrayViewPtrNDArrayViewPtr inputVector = new UnorderedMapStreamInformationPairNDArrayViewPtrNDArrayViewPtr();
+            foreach (var element in input)
+            {
+                inputVector.Add(element.Key, new PairNDArrayViewPtrNDArrayViewPtr(element.Value.Item1, element.Value.Item2));
+            }
+            return inputVector;
+        }
+
+        internal static UnorderedMapVariableMinibatchData AsUnorderedMapVariableMinibatchData(
+            IDictionary<Variable, MinibatchData> input)
+        {
+            UnorderedMapVariableMinibatchData inputVector = new UnorderedMapVariableMinibatchData();
+            foreach (var element in input)
+            {
+                inputVector.Add(element.Key, element.Value);
+            }
+            return inputVector;
+        }
+
+        internal static ParameterVector AsParameterVector(IList<Parameter> input)
+        {
+            ParameterVector inputVector = new ParameterVector();
+            foreach (var element in input)
+            {
+                inputVector.Add(element);
+            }
+            return inputVector;
+        }
+
+        internal static LearnerVector AsLearnerVector(IList<Learner> input)
+        {
+            LearnerVector inputVector = new LearnerVector();
+            foreach (var element in input)
+            {
+                inputVector.Add(element);
+            }
+            return inputVector;
+        }
+
+        internal static VariableVector AsVariableVector(IList<Variable> input)
+        {
+            VariableVector inputVector = new VariableVector();
+            foreach (var element in input)
+            {
+                inputVector.Add(element);
+            }
+            return inputVector;
+        }
+
+        internal static AxisVector AsAxisVector(IList<Axis>  input)
+        {
+            AxisVector inputVector = new AxisVector();
+            foreach (var element in input)
+            {
+                inputVector.Add(element);
+            }
+            return inputVector;
+        }
+
+        internal static UnorderedMapVariableVariable AsUnorderedMapVariableVariable(IDictionary<Variable, Variable> input)
+        {
+            UnorderedMapVariableVariable inputMap = new UnorderedMapVariableVariable();
+            foreach (var element in input)
+            {
+                inputMap.Add(element.Key, element.Value);
+            }
+            return inputMap;
+        }
+
+        internal static UnorderedMapVariableValuePtr AsUnorderedMapVariableValuePtr(IDictionary<Variable, Value> input)
+        {
+            UnorderedMapVariableValuePtr inputMap = new UnorderedMapVariableValuePtr();
+            foreach (var element in input)
+            {
+                inputMap.Add(element.Key, element.Value);
+            }
+            return inputMap;
+        }
+
+        internal static DictionaryVector AsDictionaryVector(IList<Dictionary> input)
+        {
+            DictionaryVector inputVector = new DictionaryVector();
+            foreach (var element in input)
+            {
+                inputVector.Add(element);
+            }
+            return inputVector;
+        }
     }
 }
